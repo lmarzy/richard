@@ -227,8 +227,7 @@ downloadButton.addEventListener("click", () => {
     date: documentDateInput.value,
     products,
   });
-  const filenameDate = documentDateInput.value || new Date().toISOString().slice(0, 10);
-  downloadBlob(docxBlob, `products-${filenameDate}.docx`);
+  downloadBlob(docxBlob, `DAILY-ORDER-FORM-${formatFilenameDate(documentDateInput.value)}.docx`);
 });
 
 function renderProducts() {
@@ -707,6 +706,13 @@ function formatDate(dateValue) {
     month: "long",
     year: "numeric",
   }).format(date);
+}
+
+function formatFilenameDate(dateValue) {
+  const date = dateValue ? new Date(`${dateValue}T12:00:00`) : new Date();
+  const day = new Intl.DateTimeFormat("en-GB", { day: "numeric" }).format(date);
+  const month = new Intl.DateTimeFormat("en-GB", { month: "long" }).format(date);
+  return `${day}-${month}`;
 }
 
 function downloadBlob(blob, filename) {
