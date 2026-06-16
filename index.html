@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>B Studio Daily Products</title>
+    <link rel="icon" type="image/png" href="assets/logo-trans.png">
+    <link rel="apple-touch-icon" href="assets/logo-trans.png">
+    <link rel="stylesheet" href="styles.css?v=brand-refresh">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace" aria-labelledby="page-title">
+        <div class="header-row">
+          <div class="brand-heading">
+            <img class="brand-logo" src="assets/logo-trans.png" alt="B Studio">
+            <div>
+              <p class="eyebrow">B Studio production</p>
+              <h1 id="page-title">Daily Products</h1>
+            </div>
+          </div>
+          <label class="date-field" for="documentDate">
+            <span>Document date</span>
+            <input id="documentDate" type="date">
+          </label>
+        </div>
+
+        <div class="panels">
+          <form id="productForm" class="panel product-form">
+            <div class="panel-heading">
+              <h2>Add Product</h2>
+              <p>Select a product to show its fields.</p>
+            </div>
+
+            <label for="productType">
+              <span>Product</span>
+              <select id="productType" required>
+                <option value="">Choose product</option>
+              </select>
+            </label>
+
+            <div id="fieldContainer" class="field-container">
+              <div class="field-placeholder">Choose a product to begin.</div>
+            </div>
+
+            <button class="primary-button" type="submit">Add Product</button>
+          </form>
+
+          <section class="panel document-panel" aria-labelledby="document-title">
+            <div class="panel-heading inline-heading">
+              <div>
+                <h2 id="document-title">Document Contents</h2>
+              </div>
+              <button id="downloadDoc" class="secondary-button" type="button" disabled>Download Word</button>
+            </div>
+
+            <div id="emptyState" class="empty-state">
+              Products added from the form will appear here before export.
+            </div>
+
+            <ol id="productList" class="product-list" aria-live="polite"></ol>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
