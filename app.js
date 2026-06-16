@@ -446,9 +446,11 @@ function buildDocumentXml(prettyDate, products) {
     ${paragraph("", "ProductTitleGap")}
     ${group.customers.map((customerGroup, customerIndex) => `
       ${customerIndex > 0 ? paragraph("", "CustomerSeparator") : ""}
-      ${customerGroup.items.map((product) => `
-        ${product.fields.map((field) => fieldParagraph(field.label, field.value)).join("")}
+      ${customerGroup.items.map((product, productIndex) => `
+        ${product.fields.filter((field) => field.id !== "postage").map((field) => fieldParagraph(field.label, field.value)).join("")}
+        ${productIndex < customerGroup.items.length - 1 ? paragraph("", "ItemGap") : ""}
       `).join("")}
+      ${postageParagraph(customerGroup.items)}
       ${paragraph("", "CustomerGap")}
       ${customerParagraphs(customerGroup.customer)}
       ${paragraph("", "Normal")}
@@ -505,6 +507,10 @@ function paragraphFormat(style) {
       paragraph: `<w:spacing w:before="120" w:after="160"/>`,
       run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
     },
+    ItemGap: {
+      paragraph: `<w:spacing w:before="80" w:after="140"/>`,
+      run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
+    },
     CustomerSeparator: {
       paragraph: `<w:spacing w:before="220" w:after="180"/><w:pBdr><w:bottom w:val="single" w:sz="8" w:space="1" w:color="B7C2C8"/></w:pBdr>`,
       run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
@@ -524,6 +530,16 @@ function fieldParagraph(label, value) {
     <w:r><w:rPr><w:b/></w:rPr><w:t>${escapeXml(label)}: </w:t></w:r>
     <w:r><w:t xml:space="preserve">${escapeXml(value)}</w:t></w:r>
   </w:p>`;
+}
+
+function postageParagraph(items) {
+  const postageValues = items
+    .map((item) => item.fields.find((field) => field.id === "postage")?.value || "")
+    .filter(Boolean);
+  const uniquePostageValues = [...new Set(postageValues)];
+
+  if (!uniquePostageValues.length) return "";
+  return fieldParagraph("Postage", uniquePostageValues.join(" / "));
 }
 
 function customerParagraphs(customer) {
@@ -576,6 +592,12 @@ function buildStylesXml() {
     <w:name w:val="Customer Gap"/>
     <w:qFormat/>
     <w:pPr><w:spacing w:before="120" w:after="160"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="4"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="ItemGap">
+    <w:name w:val="Item Gap"/>
+    <w:qFormat/>
+    <w:pPr><w:spacing w:before="80" w:after="140"/></w:pPr>
     <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="4"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="CustomerSeparator">
