@@ -444,8 +444,8 @@ function buildDocumentXml(prettyDate, products) {
   const productBlocks = groupProductsByTitle(products).map((group) => `
     ${paragraph(group.title, "ProductTitle")}
     ${paragraph("", "ProductTitleGap")}
-    ${group.customers.map((customerGroup) => `
-      ${paragraph("", "CustomerSeparator")}
+    ${group.customers.map((customerGroup, customerIndex) => `
+      ${customerIndex > 0 ? paragraph("", "CustomerSeparator") : ""}
       ${customerGroup.items.map((product) => `
         ${product.fields.map((field) => fieldParagraph(field.label, field.value)).join("")}
       `).join("")}
@@ -486,19 +486,19 @@ function paragraph(text, style) {
 function paragraphFormat(style) {
   const formats = {
     Title: {
-      paragraph: `<w:spacing w:after="920"/>`,
-      run: `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="56"/><w:color w:val="465352"/></w:rPr>`,
+      paragraph: `<w:spacing w:after="260"/>`,
+      run: `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="44"/><w:color w:val="465352"/></w:rPr>`,
     },
     TitleGap: {
-      paragraph: `<w:spacing w:before="0" w:after="360"/>`,
+      paragraph: `<w:spacing w:before="0" w:after="120"/>`,
       run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
     },
     ProductTitle: {
-      paragraph: `<w:spacing w:before="220" w:after="560"/>`,
-      run: `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="46"/><w:color w:val="263031"/></w:rPr>`,
+      paragraph: `<w:spacing w:before="120" w:after="180"/>`,
+      run: `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="34"/><w:color w:val="263031"/></w:rPr>`,
     },
     ProductTitleGap: {
-      paragraph: `<w:spacing w:before="0" w:after="220"/>`,
+      paragraph: `<w:spacing w:before="0" w:after="80"/>`,
       run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
     },
     CustomerGap: {
@@ -545,25 +545,25 @@ function buildStylesXml() {
   <w:style w:type="paragraph" w:styleId="Title">
     <w:name w:val="Title"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:after="920"/></w:pPr>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="56"/><w:color w:val="465352"/></w:rPr>
+    <w:pPr><w:spacing w:after="260"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="44"/><w:color w:val="465352"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="TitleGap">
     <w:name w:val="Title Gap"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:after="360"/></w:pPr>
+    <w:pPr><w:spacing w:after="120"/></w:pPr>
     <w:rPr><w:sz w:val="4"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="ProductTitle">
     <w:name w:val="Product Title"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:before="220" w:after="560"/></w:pPr>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="46"/></w:rPr>
+    <w:pPr><w:spacing w:before="120" w:after="180"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="34"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="ProductTitleGap">
     <w:name w:val="Product Title Gap"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:after="220"/></w:pPr>
+    <w:pPr><w:spacing w:after="80"/></w:pPr>
     <w:rPr><w:sz w:val="4"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Customer">
