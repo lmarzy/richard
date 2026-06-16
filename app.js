@@ -443,6 +443,7 @@ function createDocx({ date, products }) {
 function buildDocumentXml(prettyDate, products) {
   const productBlocks = groupProductsByTitle(products).map((group) => `
     ${paragraph(group.title, "ProductTitle")}
+    ${paragraph("", "ProductTitleGap")}
     ${group.customers.map((customerGroup) => `
       ${paragraph("", "CustomerSeparator")}
       ${customerGroup.items.map((product) => `
@@ -455,9 +456,10 @@ function buildDocumentXml(prettyDate, products) {
   `).join("");
 
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <w:body>
     ${paragraph(`Products for ${prettyDate}`, "Title")}
+    ${paragraph("", "TitleGap")}
     ${productBlocks}
     <w:sectPr>
       <w:pgSz w:w="11906" w:h="16838"/>
@@ -468,10 +470,52 @@ function buildDocumentXml(prettyDate, products) {
 }
 
 function paragraph(text, style) {
+  const format = paragraphFormat(style);
   return `<w:p>
-    <w:pPr><w:pStyle w:val="${style}"/></w:pPr>
-    <w:r><w:t xml:space="preserve">${escapeXml(text)}</w:t></w:r>
+    <w:pPr>
+      <w:pStyle w:val="${style}"/>
+      ${format.paragraph}
+    </w:pPr>
+    <w:r>
+      ${format.run}
+      <w:t xml:space="preserve">${escapeXml(text)}</w:t>
+    </w:r>
   </w:p>`;
+}
+
+function paragraphFormat(style) {
+  const formats = {
+    Title: {
+      paragraph: `<w:spacing w:after="920"/>`,
+      run: `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="56"/><w:color w:val="465352"/></w:rPr>`,
+    },
+    TitleGap: {
+      paragraph: `<w:spacing w:before="0" w:after="360"/>`,
+      run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
+    },
+    ProductTitle: {
+      paragraph: `<w:spacing w:before="220" w:after="560"/>`,
+      run: `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="46"/><w:color w:val="263031"/></w:rPr>`,
+    },
+    ProductTitleGap: {
+      paragraph: `<w:spacing w:before="0" w:after="220"/>`,
+      run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
+    },
+    CustomerGap: {
+      paragraph: `<w:spacing w:before="120" w:after="160"/>`,
+      run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
+    },
+    CustomerSeparator: {
+      paragraph: `<w:spacing w:before="220" w:after="180"/><w:pBdr><w:bottom w:val="single" w:sz="8" w:space="1" w:color="B7C2C8"/></w:pBdr>`,
+      run: `<w:rPr><w:sz w:val="4"/></w:rPr>`,
+    },
+    Customer: {
+      paragraph: `<w:spacing w:after="80" w:line="276" w:lineRule="auto"/>`,
+      run: `<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/></w:rPr>`,
+    },
+  };
+
+  return formats[style] || { paragraph: "", run: "" };
 }
 
 function fieldParagraph(label, value) {
@@ -501,14 +545,26 @@ function buildStylesXml() {
   <w:style w:type="paragraph" w:styleId="Title">
     <w:name w:val="Title"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:after="820"/></w:pPr>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="52"/><w:color w:val="465352"/></w:rPr>
+    <w:pPr><w:spacing w:after="920"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="56"/><w:color w:val="465352"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="TitleGap">
+    <w:name w:val="Title Gap"/>
+    <w:qFormat/>
+    <w:pPr><w:spacing w:after="360"/></w:pPr>
+    <w:rPr><w:sz w:val="4"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="ProductTitle">
     <w:name w:val="Product Title"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:before="180" w:after="460"/></w:pPr>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="42"/></w:rPr>
+    <w:pPr><w:spacing w:before="220" w:after="560"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="46"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="ProductTitleGap">
+    <w:name w:val="Product Title Gap"/>
+    <w:qFormat/>
+    <w:pPr><w:spacing w:after="220"/></w:pPr>
+    <w:rPr><w:sz w:val="4"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Customer">
     <w:name w:val="Customer"/>
