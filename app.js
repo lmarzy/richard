@@ -445,11 +445,12 @@ function buildDocumentXml(prettyDate, products) {
     ${paragraph(group.title, "ProductTitle")}
     ${group.customers.map((customerGroup) => `
       ${paragraph("", "CustomerSeparator")}
-      ${customerParagraphs(customerGroup.customer)}
       ${customerGroup.items.map((product) => `
         ${product.fields.map((field) => fieldParagraph(field.label, field.value)).join("")}
-        ${paragraph("", "Normal")}
       `).join("")}
+      ${paragraph("", "CustomerGap")}
+      ${customerParagraphs(customerGroup.customer)}
+      ${paragraph("", "Normal")}
     `).join("")}
   `).join("");
 
@@ -500,20 +501,26 @@ function buildStylesXml() {
   <w:style w:type="paragraph" w:styleId="Title">
     <w:name w:val="Title"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:after="720"/></w:pPr>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="48"/><w:color w:val="0F766E"/></w:rPr>
+    <w:pPr><w:spacing w:after="820"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="52"/><w:color w:val="465352"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="ProductTitle">
     <w:name w:val="Product Title"/>
     <w:qFormat/>
-    <w:pPr><w:spacing w:before="120" w:after="420"/></w:pPr>
-    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="40"/></w:rPr>
+    <w:pPr><w:spacing w:before="180" w:after="460"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:b/><w:sz w:val="42"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="Customer">
     <w:name w:val="Customer"/>
     <w:qFormat/>
     <w:pPr><w:spacing w:after="80" w:line="276" w:lineRule="auto"/></w:pPr>
     <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="22"/></w:rPr>
+  </w:style>
+  <w:style w:type="paragraph" w:styleId="CustomerGap">
+    <w:name w:val="Customer Gap"/>
+    <w:qFormat/>
+    <w:pPr><w:spacing w:before="120" w:after="160"/></w:pPr>
+    <w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="4"/></w:rPr>
   </w:style>
   <w:style w:type="paragraph" w:styleId="CustomerSeparator">
     <w:name w:val="Customer Separator"/>
