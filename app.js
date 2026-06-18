@@ -15,7 +15,7 @@ const productTypes = [
         id: "size",
         label: "Size",
         type: "select",
-        options: ["A4", "A3"],
+        options: ["A5", "A4", "A3"],
       },
       {
         id: "description",
