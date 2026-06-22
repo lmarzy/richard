@@ -163,6 +163,30 @@ const productTypes = [
       },
     ],
   },
+  {
+    id: "metal-signs",
+    title: "Metal Signs",
+    fields: [
+      {
+        id: "size",
+        label: "Size",
+        type: "select",
+        options: ["A5", "A4", "A3"],
+      },
+      {
+        id: "description",
+        label: "Description",
+        type: "textarea",
+        placeholder: "Enter the product description",
+      },
+      {
+        id: "postage",
+        label: "Postage",
+        type: "select",
+        options: ["1st Class", "2nd Class"],
+      },
+    ],
+  },
 ];
 
 const customerFields = [
