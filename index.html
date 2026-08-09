@@ -50,8 +50,16 @@
               <div>
                 <h2 id="document-title">Document Contents</h2>
               </div>
-              <button id="downloadDoc" class="secondary-button" type="button" disabled>Download Word</button>
+              <div class="document-actions">
+                <button id="saveDraft" class="ghost-button" type="button" disabled>Save Draft</button>
+                <button id="loadDraft" class="ghost-button" type="button">Load Draft</button>
+                <button id="clearList" class="ghost-button danger-button" type="button" disabled>Clear List</button>
+                <button id="downloadDoc" class="secondary-button" type="button" disabled>Download Word</button>
+                <input id="draftFile" class="visually-hidden" type="file" accept="application/json">
+              </div>
             </div>
+
+            <p id="draftStatus" class="draft-status" aria-live="polite"></p>
 
             <div id="emptyState" class="empty-state">
               Products added from the form will appear here before export.
@@ -63,6 +71,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=filename-format-1"></script>
+    <script src="app.js?v=draft-import-export-1"></script>
   </body>
 </html>

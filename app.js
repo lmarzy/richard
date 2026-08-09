@@ -5,6 +5,11 @@ const fieldContainer = document.querySelector("#fieldContainer");
 const productList = document.querySelector("#productList");
 const emptyState = document.querySelector("#emptyState");
 const downloadButton = document.querySelector("#downloadDoc");
+const saveDraftButton = document.querySelector("#saveDraft");
+const loadDraftButton = document.querySelector("#loadDraft");
+const clearListButton = document.querySelector("#clearList");
+const draftFileInput = document.querySelector("#draftFile");
+const draftStatus = document.querySelector("#draftStatus");
 
 const productTypes = [
   {
@@ -278,10 +283,51 @@ downloadButton.addEventListener("click", () => {
   downloadBlob(docxBlob, `DAILY-ORDER-FORM-${formatFilenameDate(documentDateInput.value)}.docx`);
 });
 
+saveDraftButton.addEventListener("click", () => {
+  if (!products.length) return;
+
+  const draftBlob = new Blob([JSON.stringify(createDraft(), null, 2)], {
+    type: "application/json",
+  });
+  downloadBlob(draftBlob, `DAILY-ORDER-FORM-${formatFilenameDate(documentDateInput.value)}.json`);
+  setDraftStatus("Draft saved.");
+});
+
+loadDraftButton.addEventListener("click", () => {
+  draftFileInput.click();
+});
+
+clearListButton.addEventListener("click", () => {
+  if (!products.length) return;
+  const shouldClear = window.confirm("Clear all products from the current list?");
+  if (!shouldClear) return;
+
+  products.splice(0, products.length);
+  renderProducts();
+  setDraftStatus("Product list cleared.");
+});
+
+draftFileInput.addEventListener("change", async () => {
+  const [file] = draftFileInput.files;
+  if (!file) return;
+
+  try {
+    const draft = JSON.parse(await file.text());
+    loadDraft(draft);
+    setDraftStatus("Draft loaded.");
+  } catch (error) {
+    setDraftStatus("That draft could not be loaded. Please choose a valid draft file.", true);
+  } finally {
+    draftFileInput.value = "";
+  }
+});
+
 function renderProducts() {
   productList.innerHTML = "";
   emptyState.hidden = products.length > 0;
   downloadButton.disabled = products.length === 0;
+  saveDraftButton.disabled = products.length === 0;
+  clearListButton.disabled = products.length === 0;
 
   groupProductsByTitle(products).forEach((group) => {
     const groupItem = document.createElement("li");
@@ -319,6 +365,69 @@ function renderProducts() {
     `;
     productList.append(groupItem);
   });
+}
+
+function createDraft() {
+  return {
+    version: 1,
+    date: documentDateInput.value,
+    products,
+  };
+}
+
+function loadDraft(draft) {
+  const draftProducts = validateDraft(draft);
+  documentDateInput.value = draft.date || "";
+  products.splice(0, products.length, ...draftProducts);
+  renderProducts();
+}
+
+function validateDraft(draft) {
+  if (!draft || typeof draft !== "object" || !Array.isArray(draft.products)) {
+    throw new Error("Invalid draft format");
+  }
+
+  return draft.products.map((product) => {
+    if (!product || typeof product !== "object") {
+      throw new Error("Invalid product in draft");
+    }
+
+    const productType = productTypes.find((type) => type.id === product.productTypeId);
+    if (!productType) {
+      throw new Error("Unknown product type in draft");
+    }
+
+    return {
+      id: product.id || crypto.randomUUID(),
+      productTypeId: productType.id,
+      title: productType.title,
+      fields: productType.fields.map((field) => {
+        const draftField = Array.isArray(product.fields)
+          ? product.fields.find((item) => item.id === field.id)
+          : null;
+        return {
+          id: field.id,
+          label: field.label,
+          value: draftField?.value ? String(draftField.value) : "",
+        };
+      }),
+      customer: customerFields.map((field) => {
+        const draftField = Array.isArray(product.customer)
+          ? product.customer.find((item) => item.id === field.id)
+          : null;
+        return {
+          id: field.id,
+          label: field.label,
+          value: draftField?.value ? String(draftField.value) : "",
+        };
+      }),
+    };
+  });
+}
+
+function setDraftStatus(message, isError = false) {
+  draftStatus.textContent = message;
+  draftStatus.classList.toggle("is-error", isError);
 }
 
 function renderProductOptions() {

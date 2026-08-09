@@ -145,6 +145,13 @@ h2 {
   margin-bottom: 28px;
 }
 
+.document-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 label {
   display: grid;
   gap: 7px;
@@ -226,7 +233,8 @@ button:disabled {
 }
 
 .primary-button,
-.secondary-button {
+.secondary-button,
+.ghost-button {
   min-height: 44px;
   padding: 0 16px;
 }
@@ -250,6 +258,54 @@ button:disabled {
 
 .secondary-button:hover:not(:disabled) {
   color: var(--cream);
+}
+
+.ghost-button {
+  border: 1px solid var(--line);
+  background: #fffdf9;
+  color: var(--brand-dark);
+  white-space: nowrap;
+}
+
+.ghost-button:hover:not(:disabled) {
+  border-color: var(--brand);
+  background: var(--surface-strong);
+}
+
+.danger-button {
+  color: var(--danger);
+}
+
+.danger-button:hover:not(:disabled) {
+  border-color: #e4b9ae;
+  background: #fff5f2;
+}
+
+.draft-status {
+  min-height: 20px;
+  margin: -14px 0 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.draft-status:empty {
+  display: none;
+}
+
+.draft-status.is-error {
+  color: var(--danger);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .empty-state {
