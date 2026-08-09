@@ -98,6 +98,30 @@ const productTypes = [
     ],
   },
   {
+    id: "metal-signs",
+    title: "Metal Signs",
+    fields: [
+      {
+        id: "size",
+        label: "Size",
+        type: "select",
+        options: ["A5", "A4", "A3"],
+      },
+      {
+        id: "description",
+        label: "Description",
+        type: "textarea",
+        placeholder: "Enter the product description",
+      },
+      {
+        id: "postage",
+        label: "Postage",
+        type: "select",
+        options: ["1st Class", "2nd Class"],
+      },
+    ],
+  },
+  {
     id: "cushions",
     title: "Cushions",
     fields: [
@@ -164,15 +188,9 @@ const productTypes = [
     ],
   },
   {
-    id: "metal-signs",
-    title: "Metal Signs",
+    id: "christmas-sacks",
+    title: "Christmas Sacks",
     fields: [
-      {
-        id: "size",
-        label: "Size",
-        type: "select",
-        options: ["A5", "A4", "A3"],
-      },
       {
         id: "description",
         label: "Description",
@@ -180,10 +198,16 @@ const productTypes = [
         placeholder: "Enter the product description",
       },
       {
-        id: "postage",
-        label: "Postage",
+        id: "material",
+        label: "Material",
         type: "select",
-        options: ["1st Class", "2nd Class"],
+        options: ["Cotton", "Polyester Linen"],
+      },
+      {
+        id: "name",
+        label: "Name",
+        type: "text",
+        placeholder: "Enter the name",
       },
     ],
   },
