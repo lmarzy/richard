@@ -214,6 +214,12 @@ const productTypes = [
         type: "text",
         placeholder: "Enter the name",
       },
+      {
+        id: "postage",
+        label: "Postage",
+        type: "select",
+        options: ["1st Class", "2nd Class"],
+      },
     ],
   },
 ];
