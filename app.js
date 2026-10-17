@@ -227,6 +227,18 @@ const productTypes = [
     title: "Advent Calendar",
     fields: [
       {
+        id: "description",
+        label: "Description",
+        type: "textarea",
+        placeholder: "Enter the product description",
+      },
+      {
+        id: "name",
+        label: "Name",
+        type: "text",
+        placeholder: "Enter the name",
+      },
+      {
         id: "colour",
         label: "Colour",
         type: "select",
