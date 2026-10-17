@@ -222,6 +222,24 @@ const productTypes = [
       },
     ],
   },
+  {
+    id: "advent-calendar",
+    title: "Advent Calendar",
+    fields: [
+      {
+        id: "colour",
+        label: "Colour",
+        type: "select",
+        options: ["Red", "Natural"],
+      },
+      {
+        id: "postage",
+        label: "Postage",
+        type: "select",
+        options: ["1st Class", "2nd Class"],
+      },
+    ],
+  },
 ];
 
 const customerFields = [
