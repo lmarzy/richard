@@ -268,6 +268,21 @@ const customerFields = [
 ];
 
 const products = [];
+let editingProductId = null;
+const submitProductButton = productForm.querySelector('button[type="submit"]');
+const cancelEditButton = document.querySelector("#cancelEdit");
+
+function finishEditing() {
+  editingProductId = null;
+  submitProductButton.textContent = "Add Product";
+  productForm.querySelector("h2").textContent = "Add Product";
+  cancelEditButton.hidden = true;
+}
+
+cancelEditButton.addEventListener("click", () => {
+  finishEditing();
+  renderSelectedProductFields();
+});
 
 documentDateInput.valueAsDate = new Date();
 renderProductOptions();
@@ -281,10 +296,14 @@ productForm.addEventListener("submit", (event) => {
   const productType = getSelectedProductType();
   if (!productType) return;
 
+  const quantityInput = document.querySelector("#quantity");
+  if (!quantityInput.reportValidity()) return;
+
   const formProduct = {
-    id: crypto.randomUUID(),
+    id: editingProductId || crypto.randomUUID(),
     productTypeId: productType.id,
     title: productType.title,
+    quantity: Number(quantityInput.value),
     fields: productType.fields.map((field) => {
       const input = document.querySelector(`#${field.id}`);
       return {
@@ -303,7 +322,13 @@ productForm.addEventListener("submit", (event) => {
     }),
   };
 
-  products.push(formProduct);
+  const editingIndex = products.findIndex((product) => product.id === editingProductId);
+  if (editingIndex >= 0) {
+    products[editingIndex] = formProduct;
+  } else {
+    products.push(formProduct);
+  }
+  finishEditing();
   resetProductFields(productType);
   resetCustomerFields();
   renderProducts();
@@ -339,6 +364,8 @@ clearListButton.addEventListener("click", () => {
   if (!shouldClear) return;
 
   products.splice(0, products.length);
+  finishEditing();
+  renderSelectedProductFields();
   renderProducts();
   setDraftStatus("Product list cleared.");
 });
@@ -382,9 +409,14 @@ function renderProducts() {
                 <article class="product-card">
                   <div class="product-card-header">
                     <span class="entry-label">Item ${index + 1}</span>
+                    <button class="ghost-button edit-button" type="button" data-id="${product.id}">Edit</button>
                     <button class="remove-button" type="button" aria-label="Remove product" data-id="${product.id}">×</button>
                   </div>
                   <div class="details">
+                    <div class="detail">
+                      <strong>Quantity</strong>
+                      <span>${product.quantity ?? 1}</span>
+                    </div>
                     ${product.fields.map((field) => `
                       <div class="detail ${field.id === "description" ? "description-detail" : ""}">
                         <strong>${escapeHtml(field.label)}</strong>
@@ -415,6 +447,8 @@ function loadDraft(draft) {
   const draftProducts = validateDraft(draft);
   documentDateInput.value = draft.date || "";
   products.splice(0, products.length, ...draftProducts);
+  finishEditing();
+  renderSelectedProductFields();
   renderProducts();
 }
 
@@ -433,10 +467,16 @@ function validateDraft(draft) {
       throw new Error("Unknown product type in draft");
     }
 
+    const quantity = product.quantity ?? 1;
+    if (!Number.isSafeInteger(quantity) || quantity < 1) {
+      throw new Error("Invalid quantity in draft");
+    }
+
     return {
       id: product.id || crypto.randomUUID(),
       productTypeId: productType.id,
       title: productType.title,
+      quantity,
       fields: productType.fields.map((field) => {
         const draftField = Array.isArray(product.fields)
           ? product.fields.find((item) => item.id === field.id)
@@ -483,6 +523,11 @@ function renderSelectedProductFields() {
     fieldContainer.innerHTML = `<div class="field-placeholder">Choose a product to begin.</div>`;
     return;
   }
+
+  const quantityLabel = document.createElement("label");
+  quantityLabel.htmlFor = "quantity";
+  quantityLabel.innerHTML = `<span>Quantity</span><input id="quantity" name="quantity" type="number" min="1" max="9007199254740991" step="1" value="1" required>`;
+  fieldContainer.append(quantityLabel);
 
   productType.fields.forEach((field) => {
     fieldContainer.append(createFieldControl(field));
@@ -541,6 +586,7 @@ function getSelectedProductType() {
 }
 
 function resetProductFields(productType) {
+  document.querySelector("#quantity").value = "1";
   productType.fields.forEach((field) => {
     const input = document.querySelector(`#${field.id}`);
     if (input) input.value = "";
@@ -596,11 +642,34 @@ function normaliseCustomerText(value) {
 }
 
 productList.addEventListener("click", (event) => {
+  const editButton = event.target.closest(".edit-button");
+  if (editButton) {
+    const product = products.find((item) => item.id === editButton.dataset.id);
+    if (!product) return;
+    editingProductId = product.id;
+    productTypeInput.value = product.productTypeId;
+    renderSelectedProductFields();
+    document.querySelector("#quantity").value = product.quantity ?? 1;
+    [...product.fields, ...product.customer].forEach((field) => {
+      const input = document.getElementById(field.id);
+      if (input) input.value = field.value;
+    });
+    submitProductButton.textContent = "Save Changes";
+    productForm.querySelector("h2").textContent = "Edit Product";
+    cancelEditButton.hidden = false;
+    productForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector("#quantity").focus({ preventScroll: true });
+    return;
+  }
   const removeButton = event.target.closest(".remove-button");
   if (!removeButton) return;
 
   const index = products.findIndex((product) => product.id === removeButton.dataset.id);
   if (index >= 0) {
+    if (products[index].id === editingProductId) {
+      finishEditing();
+      renderSelectedProductFields();
+    }
     products.splice(index, 1);
     renderProducts();
   }
@@ -639,6 +708,7 @@ function buildDocumentXml(prettyDate, products) {
     ${group.customers.map((customerGroup, customerIndex) => `
       ${customerIndex > 0 ? paragraph("", "CustomerSeparator") : ""}
       ${customerGroup.items.map((product, productIndex) => `
+        ${fieldParagraph("Quantity", product.quantity ?? 1)}
         ${product.fields.filter((field) => field.id !== "postage").map((field) => fieldParagraph(field.label, field.value)).join("")}
         ${productIndex < customerGroup.items.length - 1 ? paragraph("", "ItemGap") : ""}
       `).join("")}
