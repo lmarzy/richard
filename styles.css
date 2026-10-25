@@ -401,12 +401,28 @@ button:disabled {
   text-transform: uppercase;
 }
 
-.remove-button {
+.item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.item-action {
+  display: grid;
+  place-items: center;
   width: 34px;
   height: 34px;
   background: #fffdf9;
-  color: var(--danger);
-  border: 1px solid #e4b9ae;
+  border: 1px solid var(--line);
+}
+
+.item-action:hover {
+  background: var(--cream);
+  border-color: var(--brand);
+}
+
+.item-action:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 .details {

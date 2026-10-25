@@ -409,15 +409,18 @@ function renderProducts() {
                 <article class="product-card">
                   <div class="product-card-header">
                     <span class="entry-label">Item ${index + 1}</span>
-                    <button class="ghost-button edit-button" type="button" data-id="${product.id}">Edit</button>
-                    <button class="remove-button" type="button" aria-label="Remove product" data-id="${product.id}">×</button>
+                    <div class="item-actions">
+                      <button class="item-action edit-button" type="button" aria-label="Edit product" title="Edit product" data-id="${product.id}"><img src="assets/pencil.svg" alt="" width="18" height="18"></button>
+                      <button class="item-action remove-button" type="button" aria-label="Remove product" title="Remove product" data-id="${product.id}"><img src="assets/x.svg" alt="" width="18" height="18"></button>
+                    </div>
                   </div>
                   <div class="details">
+                    ${product.fields.filter((field) => field.id === "description").map((field) => `<div class="detail description-detail"><strong>${escapeHtml(field.label)}</strong><span>${escapeHtml(field.value)}</span></div>`).join("")}
                     <div class="detail">
                       <strong>Quantity</strong>
                       <span>${product.quantity ?? 1}</span>
                     </div>
-                    ${product.fields.map((field) => `
+                    ${product.fields.filter((field) => field.id !== "description").map((field) => `
                       <div class="detail ${field.id === "description" ? "description-detail" : ""}">
                         <strong>${escapeHtml(field.label)}</strong>
                         <span>${escapeHtml(field.value)}</span>
@@ -527,9 +530,12 @@ function renderSelectedProductFields() {
   const quantityLabel = document.createElement("label");
   quantityLabel.htmlFor = "quantity";
   quantityLabel.innerHTML = `<span>Quantity</span><input id="quantity" name="quantity" type="number" min="1" max="9007199254740991" step="1" value="1" required>`;
+  productType.fields.filter((field) => field.id === "description").forEach((field) => {
+    fieldContainer.append(createFieldControl(field));
+  });
   fieldContainer.append(quantityLabel);
 
-  productType.fields.forEach((field) => {
+  productType.fields.filter((field) => field.id !== "description").forEach((field) => {
     fieldContainer.append(createFieldControl(field));
   });
 
@@ -708,8 +714,9 @@ function buildDocumentXml(prettyDate, products) {
     ${group.customers.map((customerGroup, customerIndex) => `
       ${customerIndex > 0 ? paragraph("", "CustomerSeparator") : ""}
       ${customerGroup.items.map((product, productIndex) => `
+        ${product.fields.filter((field) => field.id === "description").map((field) => fieldParagraph(field.label, field.value)).join("")}
         ${fieldParagraph("Quantity", product.quantity ?? 1)}
-        ${product.fields.filter((field) => field.id !== "postage").map((field) => fieldParagraph(field.label, field.value)).join("")}
+        ${product.fields.filter((field) => field.id !== "postage" && field.id !== "description").map((field) => fieldParagraph(field.label, field.value)).join("")}
         ${productIndex < customerGroup.items.length - 1 ? paragraph("", "ItemGap") : ""}
       `).join("")}
       ${postageParagraph(customerGroup.items)}
